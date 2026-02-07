@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import { productQueries } from '@/lib/db/queries';
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,83 +16,25 @@ export async function GET(req: NextRequest) {
     const minPrice = searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined;
 
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let paramCount = 1;
+    const filters = {
+      team: searchQuery ? searchQuery : team,
+      year,
+      condition,
+      minPrice,
+      maxPrice
+    };
 
-    if (searchQuery) {
-      conditions.push(`(p.name ILIKE $${paramCount} OR p.team ILIKE $${paramCount} OR p.description ILIKE $${paramCount})`);
-      params.push(`%${searchQuery}%`);
-      paramCount++;
-    }
-
-    if (team) {
-      conditions.push(`p.team ILIKE $${paramCount}`);
-      params.push(`%${team}%`);
-      paramCount++;
-    }
-
-    if (year) {
-      conditions.push(`p.year = $${paramCount}`);
-      params.push(year);
-      paramCount++;
-    }
-
-    if (condition) {
-      conditions.push(`p.condition = $${paramCount}`);
-      params.push(condition);
-      paramCount++;
-    }
-
-    if (size) {
-      conditions.push(`p.size = $${paramCount}`);
-      params.push(size);
-      paramCount++;
-    }
-
-    if (minPrice !== undefined) {
-      conditions.push(`p.price >= $${paramCount}`);
-      params.push(minPrice);
-      paramCount++;
-    }
-
-    if (maxPrice !== undefined) {
-      conditions.push(`p.price <= $${paramCount}`);
-      params.push(maxPrice);
-      paramCount++;
-    }
-
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    
-    params.push(limit, offset);
-
-    const result = await query(
-      `SELECT p.*, 
-       COALESCE(json_agg(pi.*) FILTER (WHERE pi.id IS NOT NULL), '[]') as images
-       FROM products p
-       LEFT JOIN product_images pi ON p.id = pi.product_id
-       ${whereClause}
-       GROUP BY p.id
-       ORDER BY p.created_at DESC
-       LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
-      params
-    );
-
-    const countResult = await query(
-      `SELECT COUNT(DISTINCT p.id) as count
-       FROM products p
-       ${whereClause}`,
-      params.slice(0, -2)
-    );
-
-    const total = parseInt(countResult.rows[0].count, 10);
+    const products = await productQueries.search(filters, limit, offset);
+    const total = await productQueries.count(filters);
 
     return NextResponse.json({
-      data: result.rows,
+      data: products,
       total,
       page,
       perPage: limit,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
+      query: searchQuery,
+      filters: { size }
     });
   } catch (error) {
     console.error('Error searching products:', error);

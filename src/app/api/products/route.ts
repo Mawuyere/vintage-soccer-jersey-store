@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  return requireAdmin(req, async (req: NextRequest, _user: JWTPayload) => {
+  return requireAdmin(req, async (req: NextRequest, user: JWTPayload) => {
     try {
       const body = await req.json();
       const validated = createProductSchema.parse(body);
@@ -88,6 +88,8 @@ export async function POST(req: NextRequest) {
         inventory: validated.inventory,
         featured: validated.featured
       });
+
+      console.log(`[AUDIT] Product created by admin user ${user.userId} (${user.email}): SKU ${validated.sku}, ID ${product.id}`);
 
       if (validated.images && validated.images.length > 0) {
         for (const image of validated.images) {

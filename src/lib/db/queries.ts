@@ -155,73 +155,7 @@ export const productQueries = {
     return result.rows[0];
   },
 
-  search: async (filters: {
-    team?: string;
-    year?: string;
-    condition?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    featured?: boolean;
-  }, limit = 50, offset = 0) => {
-    const conditions: string[] = [];
-    const params: unknown[] = [];
-    let paramCount = 1;
-
-    if (filters.team) {
-      conditions.push(`team ILIKE $${paramCount}`);
-      params.push(`%${filters.team}%`);
-      paramCount++;
-    }
-
-    if (filters.year) {
-      conditions.push(`year = $${paramCount}`);
-      params.push(filters.year);
-      paramCount++;
-    }
-
-    if (filters.condition) {
-      conditions.push(`condition = $${paramCount}`);
-      params.push(filters.condition);
-      paramCount++;
-    }
-
-    if (filters.minPrice !== undefined) {
-      conditions.push(`price >= $${paramCount}`);
-      params.push(filters.minPrice);
-      paramCount++;
-    }
-
-    if (filters.maxPrice !== undefined) {
-      conditions.push(`price <= $${paramCount}`);
-      params.push(filters.maxPrice);
-      paramCount++;
-    }
-
-    if (filters.featured !== undefined) {
-      conditions.push(`featured = $${paramCount}`);
-      params.push(filters.featured);
-      paramCount++;
-    }
-
-    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    
-    params.push(limit, offset);
-
-    const result = await query(
-      `SELECT p.*, 
-       COALESCE(json_agg(pi.*) FILTER (WHERE pi.id IS NOT NULL), '[]') as images
-       FROM products p
-       LEFT JOIN product_images pi ON p.id = pi.product_id
-       ${whereClause}
-       GROUP BY p.id
-       ORDER BY p.created_at DESC
-       LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
-      params
-    );
-    return result.rows;
-  },
-
-  count: async (filters: {
+  buildFilterConditions: (filters: {
     team?: string;
     year?: string;
     condition?: string;
@@ -269,6 +203,45 @@ export const productQueries = {
       paramCount++;
     }
 
+    return { conditions, params, paramCount };
+  },
+
+  search: async (filters: {
+    team?: string;
+    year?: string;
+    condition?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    featured?: boolean;
+  }, limit = 50, offset = 0) => {
+    const { conditions, params, paramCount } = productQueries.buildFilterConditions(filters);
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+    
+    params.push(limit, offset);
+
+    const result = await query(
+      `SELECT p.*, 
+       COALESCE(json_agg(pi.*) FILTER (WHERE pi.id IS NOT NULL), '[]') as images
+       FROM products p
+       LEFT JOIN product_images pi ON p.id = pi.product_id
+       ${whereClause}
+       GROUP BY p.id
+       ORDER BY p.created_at DESC
+       LIMIT $${paramCount} OFFSET $${paramCount + 1}`,
+      params
+    );
+    return result.rows;
+  },
+
+  count: async (filters: {
+    team?: string;
+    year?: string;
+    condition?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    featured?: boolean;
+  }) => {
+    const { conditions, params } = productQueries.buildFilterConditions(filters);
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
     const result = await query(
