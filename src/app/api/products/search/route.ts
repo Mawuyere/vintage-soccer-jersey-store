@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
       team: searchQuery ? searchQuery : team,
       year,
       condition,
+      size,
       minPrice,
       maxPrice
     };
@@ -33,8 +34,7 @@ export async function GET(req: NextRequest) {
       page,
       perPage: limit,
       totalPages: Math.ceil(total / limit),
-      query: searchQuery,
-      filters: { size }
+      query: searchQuery
     });
   } catch (error) {
     console.error('Error searching products:', error);

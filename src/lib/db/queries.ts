@@ -159,6 +159,7 @@ export const productQueries = {
     team?: string;
     year?: string;
     condition?: string;
+    size?: string;
     minPrice?: number;
     maxPrice?: number;
     featured?: boolean;
@@ -182,6 +183,12 @@ export const productQueries = {
     if (filters.condition) {
       conditions.push(`condition = $${paramCount}`);
       params.push(filters.condition);
+      paramCount++;
+    }
+
+    if (filters.size) {
+      conditions.push(`size = $${paramCount}`);
+      params.push(filters.size);
       paramCount++;
     }
 
@@ -210,6 +217,7 @@ export const productQueries = {
     team?: string;
     year?: string;
     condition?: string;
+    size?: string;
     minPrice?: number;
     maxPrice?: number;
     featured?: boolean;
@@ -237,6 +245,7 @@ export const productQueries = {
     team?: string;
     year?: string;
     condition?: string;
+    size?: string;
     minPrice?: number;
     maxPrice?: number;
     featured?: boolean;

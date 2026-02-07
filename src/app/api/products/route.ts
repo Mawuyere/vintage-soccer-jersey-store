@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
     const team = searchParams.get('team') || undefined;
     const year = searchParams.get('year') || undefined;
     const condition = searchParams.get('condition') || undefined;
+    const size = searchParams.get('size') || undefined;
     const minPrice = searchParams.get('minPrice') ? parseFloat(searchParams.get('minPrice')!) : undefined;
     const maxPrice = searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined;
 
@@ -39,6 +40,7 @@ export async function GET(req: NextRequest) {
       team,
       year,
       condition,
+      size,
       minPrice,
       maxPrice
     };
