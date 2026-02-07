@@ -40,7 +40,10 @@ export function cleanupRateLimitMap() {
   }
 }
 
-setInterval(cleanupRateLimitMap, 60000);
+let cleanupIntervalId: NodeJS.Timeout | null = null;
+if (!cleanupIntervalId) {
+  cleanupIntervalId = setInterval(cleanupRateLimitMap, 60000);
+}
 
 export function applyRateLimit(req: NextRequest): NextResponse | null {
   const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';

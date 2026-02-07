@@ -2,7 +2,10 @@ import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { JWTPayload, SessionUser } from '@/types';
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET || 'fallback-secret';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET or NEXTAUTH_SECRET must be set in environment variables');
+}
 const BCRYPT_ROUNDS = parseInt(process.env.BCRYPT_ROUNDS || '10', 10);
 const JWT_EXPIRATION = '7d';
 const REFRESH_TOKEN_EXPIRATION = '30d';

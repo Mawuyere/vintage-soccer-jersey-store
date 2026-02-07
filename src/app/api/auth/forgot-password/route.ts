@@ -45,7 +45,9 @@ export async function POST(req: NextRequest) {
 
     const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/reset-password?token=${resetToken}`;
 
-    console.log('Password reset URL:', resetUrl);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Password reset URL:', resetUrl);
+    }
 
     return NextResponse.json(
       {

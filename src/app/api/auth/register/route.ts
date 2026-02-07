@@ -67,7 +67,9 @@ export async function POST(req: NextRequest) {
 
     const verificationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/verify-email?token=${verificationToken}`;
 
-    console.log('Email verification URL:', verificationUrl);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Email verification URL:', verificationUrl);
+    }
 
     const sessionUser = createSessionUser({
       id: user.id,
