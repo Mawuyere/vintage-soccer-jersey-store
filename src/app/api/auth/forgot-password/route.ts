@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         message: 'If an account with that email exists, a password reset link has been sent.',
-        resetUrl: process.env.NODE_ENV === 'development' ? resetUrl : undefined,
       },
       { status: 200 }
     );
