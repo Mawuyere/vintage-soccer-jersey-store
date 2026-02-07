@@ -221,6 +221,63 @@ export const productQueries = {
     return result.rows;
   },
 
+  count: async (filters: {
+    team?: string;
+    year?: string;
+    condition?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    featured?: boolean;
+  }) => {
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    let paramCount = 1;
+
+    if (filters.team) {
+      conditions.push(`team ILIKE $${paramCount}`);
+      params.push(`%${filters.team}%`);
+      paramCount++;
+    }
+
+    if (filters.year) {
+      conditions.push(`year = $${paramCount}`);
+      params.push(filters.year);
+      paramCount++;
+    }
+
+    if (filters.condition) {
+      conditions.push(`condition = $${paramCount}`);
+      params.push(filters.condition);
+      paramCount++;
+    }
+
+    if (filters.minPrice !== undefined) {
+      conditions.push(`price >= $${paramCount}`);
+      params.push(filters.minPrice);
+      paramCount++;
+    }
+
+    if (filters.maxPrice !== undefined) {
+      conditions.push(`price <= $${paramCount}`);
+      params.push(filters.maxPrice);
+      paramCount++;
+    }
+
+    if (filters.featured !== undefined) {
+      conditions.push(`featured = $${paramCount}`);
+      params.push(filters.featured);
+      paramCount++;
+    }
+
+    const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    const result = await query(
+      `SELECT COUNT(*) as count FROM products ${whereClause}`,
+      params
+    );
+    return parseInt(result.rows[0].count, 10);
+  },
+
   create: async (product: {
     name: string;
     team: string;
@@ -407,6 +464,19 @@ export const orderQueries = {
       [limit, offset]
     );
     return result.rows;
+  },
+
+  countByUserId: async (userId: number) => {
+    const result = await query(
+      'SELECT COUNT(*) as count FROM orders WHERE user_id = $1',
+      [userId]
+    );
+    return parseInt(result.rows[0].count, 10);
+  },
+
+  countAll: async () => {
+    const result = await query('SELECT COUNT(*) as count FROM orders', []);
+    return parseInt(result.rows[0].count, 10);
   },
 
   create: async (

@@ -31,12 +31,10 @@ export async function GET(req: NextRequest) {
 
       if (user.isAdmin) {
         orders = await orderQueries.findAll(limit, offset);
-        const allOrders = await orderQueries.findAll(1000000, 0);
-        total = allOrders.length;
+        total = await orderQueries.countAll();
       } else {
         orders = await orderQueries.findByUserId(user.userId, limit, offset);
-        const allOrders = await orderQueries.findByUserId(user.userId, 1000000, 0);
-        total = allOrders.length;
+        total = await orderQueries.countByUserId(user.userId);
       }
 
       return NextResponse.json({

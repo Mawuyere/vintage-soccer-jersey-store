@@ -44,9 +44,7 @@ export async function GET(req: NextRequest) {
     };
 
     const products = await productQueries.search(filters, limit, offset);
-
-    const countResult = await productQueries.search(filters, 1000000, 0);
-    const total = countResult.length;
+    const total = await productQueries.count(filters);
 
     return NextResponse.json({
       data: products,
