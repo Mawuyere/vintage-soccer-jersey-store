@@ -101,11 +101,7 @@ export async function POST(req: NextRequest) {
       }
 
       const shippingAddress = {
-        street: validated.shippingAddress.street,
-        city: validated.shippingAddress.city,
-        state: validated.shippingAddress.state,
-        zip: validated.shippingAddress.zip,
-        country: validated.shippingAddress.country,
+        ...validated.shippingAddress,
         isDefault: false
       };
 

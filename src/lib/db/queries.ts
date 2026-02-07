@@ -284,8 +284,8 @@ export const productQueries = {
         product.size,
         product.description,
         product.sku,
-        product.inventory || 1,
-        product.featured || false,
+        product.inventory ?? 1,
+        product.featured ?? false,
       ]
     );
     return result.rows[0];

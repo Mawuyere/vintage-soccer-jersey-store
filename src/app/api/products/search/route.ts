@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     const maxPrice = searchParams.get('maxPrice') ? parseFloat(searchParams.get('maxPrice')!) : undefined;
 
     const filters = {
-      team: searchQuery ? searchQuery : team,
+      team,
       year,
       condition,
       size,
