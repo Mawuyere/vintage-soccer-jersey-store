@@ -30,8 +30,14 @@ export const userQueries = {
   },
 
   update: async (id: number, updates: Record<string, unknown>) => {
-    const keys = Object.keys(updates);
-    const values = Object.values(updates);
+    const allowedFields = ['email', 'password_hash', 'name', 'phone', 'email_verified'];
+    const keys = Object.keys(updates).filter(key => allowedFields.includes(key));
+    
+    if (keys.length === 0) {
+      throw new Error('No valid fields to update');
+    }
+    
+    const values = keys.map(key => updates[key]);
     const setClause = keys.map((key, idx) => `${key} = $${idx + 2}`).join(', ');
     
     const result = await query(
@@ -247,8 +253,14 @@ export const productQueries = {
   },
 
   update: async (id: number, updates: Record<string, unknown>) => {
-    const keys = Object.keys(updates);
-    const values = Object.values(updates);
+    const allowedFields = ['name', 'team', 'year', 'price', 'condition', 'size', 'description', 'sku', 'inventory', 'featured'];
+    const keys = Object.keys(updates).filter(key => allowedFields.includes(key));
+    
+    if (keys.length === 0) {
+      throw new Error('No valid fields to update');
+    }
+    
+    const values = keys.map(key => updates[key]);
     const setClause = keys.map((key, idx) => `${key} = $${idx + 2}`).join(', ');
     
     const result = await query(

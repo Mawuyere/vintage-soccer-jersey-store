@@ -217,6 +217,7 @@ async function seedDatabase() {
     
     console.log('Creating admin user...');
     const hashedPassword = await bcrypt.hash('admin123', 10);
+    // NOTE: This is a demo password for development only. Change in production!
     const userResult = await client.query(
       `INSERT INTO users (email, password_hash, name, email_verified)
        VALUES ($1, $2, $3, $4)
@@ -235,6 +236,7 @@ async function seedDatabase() {
     console.log('✅ Admin user created (email: admin@example.com, password: admin123)');
     
     console.log('Creating sample customer users...');
+    // NOTE: Demo passwords for development only. Use strong passwords in production!
     const customerPassword = await bcrypt.hash('password123', 10);
     await client.query(
       `INSERT INTO users (email, password_hash, name, phone, email_verified)
