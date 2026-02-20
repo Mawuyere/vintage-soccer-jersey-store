@@ -50,6 +50,12 @@ const ProductCard = ({
 
   const primaryImage = product.images?.[0]?.imageUrl || '/placeholder-jersey.jpg';
   const imageAlt = product.images?.[0]?.altText || `${product.team} ${product.year} jersey`;
+  const priceValue = typeof product.price === 'number'
+    ? product.price
+    : Number(product.price);
+  const formattedPrice = Number.isFinite(priceValue)
+    ? priceValue.toFixed(2)
+    : '0.00';
 
   return (
     <Link href={`/products/${product.id}`}>
@@ -117,7 +123,7 @@ const ProductCard = ({
 
             <div className="flex items-center justify-between">
               <span className="text-2xl font-bold text-gray-900">
-                ${product.price.toFixed(2)}
+                ${formattedPrice}
               </span>
               <Badge variant="secondary" size="sm">
                 Size {product.size}

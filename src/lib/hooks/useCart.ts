@@ -66,8 +66,15 @@ export function useCart(): UseCartReturn {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to add item to cart');
+        if (response.status === 401) {
+          throw new Error('Please log in to add items to your cart');
+        }
+        try {
+          const error = await response.json();
+          throw new Error(error.message || 'Failed to add item to cart');
+        } catch {
+          throw new Error('Failed to add item to cart');
+        }
       }
 
       await fetchCart();

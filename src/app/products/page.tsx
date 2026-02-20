@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import FeaturedProducts from '@/components/product/FeaturedProducts';
 import ProductGrid from '@/components/product/ProductGrid';
 import ProductFilter from '@/components/product/ProductFilter';
 import SearchBar from '@/components/product/SearchBar';
@@ -12,7 +11,7 @@ import type { Product, ProductFilters } from '@/types';
 
 const DEFAULT_LIMIT = 200;
 
-export default function Home() {
+export default function ProductsPage() {
   const { itemCount, addItem } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -48,11 +47,6 @@ export default function Home() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
-  const featuredProducts = useMemo(
-    () => products.filter((product) => product.featured),
-    [products]
-  );
 
   const availableTeams = useMemo(() => {
     const teams = new Set(products.map((product) => product.team).filter(Boolean));
@@ -107,16 +101,13 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="bg-white border-b border-gray-200">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="max-w-3xl">
-              <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
-                Authentic Vintage Soccer Jerseys
-              </p>
-              <h1 className="mt-3 text-4xl sm:text-5xl font-bold text-gray-900">
-                Relive the greatest kits in football history
+              <h1 className="text-4xl sm:text-5xl font-bold text-gray-900">
+                All Products
               </h1>
               <p className="mt-4 text-lg text-gray-600">
-                Shop curated collections of rare and iconic jerseys from clubs and national teams worldwide.
+                Browse our complete collection of vintage soccer jerseys.
               </p>
               <div className="mt-8 max-w-xl">
                 <SearchBar onSearch={setSearchQuery} />
@@ -124,14 +115,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        <FeaturedProducts
-          products={featuredProducts}
-          isLoading={isLoading}
-          error={error}
-          onAddToCart={handleAddToCart}
-          title="Featured Jerseys"
-        />
 
         <section className="py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -146,7 +129,7 @@ export default function Home() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <h2 className="text-2xl font-semibold text-gray-900">All Jerseys</h2>
+                    <h2 className="text-2xl font-semibold text-gray-900">Results</h2>
                     <p className="text-sm text-gray-600">
                       Showing {filteredProducts.length} of {products.length} items
                     </p>
